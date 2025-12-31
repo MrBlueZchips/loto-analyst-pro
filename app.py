@@ -50,13 +50,49 @@ def main():
         except FileNotFoundError:
             st.warning(f"Manual não encontrado em: {manual_path}")
 
-    # --- Sidebar ---
+    # --- Game Selection Logic (Synced) ---
+    
+    # Initialize state
+    if "selected_game_type" not in st.session_state:
+        st.session_state["selected_game_type"] = "lotofacil"
+        
+    def  update_game_from_sidebar():
+        st.session_state["selected_game_type"] = st.session_state.game_type_sidebar
+        
+    def update_game_from_main():
+        st.session_state["selected_game_type"] = st.session_state.game_type_main
+
+    GAME_OPTIONS = ["lotofacil", "megasena"]
+    GAME_LABELS = {"lotofacil": "Lotofácil", "megasena": "Mega-Sena"}
+    
+    current_index = GAME_OPTIONS.index(st.session_state["selected_game_type"])
+
+    # 1. Main Area Selector (Visible on Mobile/Desktop Top)
+    col_sel1, col_sel2 = st.columns([2, 1])
+    with col_sel1:
+        st.selectbox(
+            "Selecione o Jogo (Principal)", 
+            GAME_OPTIONS,
+            index=current_index,
+            format_func=lambda x: GAME_LABELS[x],
+            key="game_type_main",
+            on_change=update_game_from_main,
+            label_visibility="collapsed"
+        )
+    
+    # 2. Sidebar Selector (Synced)
     st.sidebar.header("Configuração")
-    game_type = st.sidebar.selectbox(
+    st.sidebar.selectbox(
         "Selecione o Jogo", 
-        ["lotofacil", "megasena"],
-        format_func=lambda x: "Lotofácil" if x == "lotofacil" else "Mega-Sena"
+        GAME_OPTIONS,
+        index=current_index,
+        format_func=lambda x: GAME_LABELS[x],
+        key="game_type_sidebar",
+        on_change=update_game_from_sidebar
     )
+    
+    # Use state for loading
+    game_type = st.session_state["selected_game_type"]
 
     # Load Data
     @st.cache_data
@@ -66,10 +102,14 @@ def main():
         fe = FeatureExtractor(df, game_type=game_type)
         df = fe.extract_features()
         return df
-
-    with st.spinner("Carregando Dados..."):
+ 
+    with st.spinner(f"Carregando dados de {GAME_LABELS[game_type]}..."):
         df = load_data(game_type)
-
+        
+    # Metrics display in main area
+    with col_sel2:
+        st.metric("Sorteios Carregados", len(df))
+        
     st.sidebar.success(f"Carregados {len(df)} sorteios.")
 
     # Global Stats Analyzer
