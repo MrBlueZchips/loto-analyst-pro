@@ -78,10 +78,44 @@ def render(df, stats_analyzer, game_type):
                 
                 pool = gen.generate_candidate_pool(pool_size=pool_size)
                 
-                # 3. Unfolding
+                # 3. Unfolding with Random Injection
+                # We generate games with -1 size, then inject 1 random number
+                
+                std_draw_size = 15 if game_type == 'lotofacil' else 6
+                target_unfold_size = std_draw_size - 1
+                
+                # Check if we have enough numbers to unfold (Pool + Fixed)
+                # If fixed >= target, we might have issues, but let's assume valid
+                
                 unfolder = Unfolder(game_type)
                 
-                games = unfolder.unfold(pool, fixed_numbers=fixed_numbers, limit=n_games)
+                # Generate base games (size N-1)
+                base_games = unfolder.unfold(
+                    pool, 
+                    fixed_numbers=fixed_numbers, 
+                    limit=n_games, 
+                    override_draw_size=target_unfold_size
+                )
+                
+                # Inject Random Number
+                import random
+                max_num = 25 if game_type == 'lotofacil' else 60
+                all_possible = set(range(1, max_num + 1))
+                
+                final_games = []
+                for game in base_games:
+                    current_set = set(game)
+                    remaining = list(all_possible - current_set)
+                    
+                    if remaining:
+                        random_addition = random.choice(remaining)
+                        new_game = sorted(game + [random_addition])
+                        final_games.append(new_game)
+                    else:
+                        # Should not happen in lottery context
+                        final_games.append(game)
+                
+                games = final_games
                 
                 # SAVE TO SESSION STATE
                 st.session_state[ss_key] = {

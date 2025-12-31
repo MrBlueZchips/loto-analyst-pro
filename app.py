@@ -87,25 +87,26 @@ def main():
         if "active_tab" not in st.session_state:
             st.session_state["active_tab"] = TAB_NAMES[0]
 
-        # Use radio button as a controlled tab system
-        selected_tab = st.radio(
-            "Navegação", 
+        # Use Sidebar for Navigation (Mobile Friendly standard)
+        st.sidebar.divider()
+        st.sidebar.header("Navegação")
+        
+        selected_tab = st.sidebar.radio(
+            "Ir para:", 
             TAB_NAMES, 
             index=TAB_NAMES.index(st.session_state["active_tab"]),
-            horizontal=True,
-            label_visibility="collapsed",
             key="nav_radio"
         )
         
         # Sync simple variable with state for logic ensuring
         st.session_state["active_tab"] = selected_tab
         
-        st.divider()
-        
-        # Render the selected content
+        # Render the selected content logic remains the same...
         if selected_tab == TAB_NAMES[0]:
+            st.header(TAB_NAMES[0]) # Re-add header since tab strip is gone
             tab_stats.render(df, stats_analyzer, game_type)
         elif selected_tab == TAB_NAMES[1]:
+            # st.header(TAB_NAMES[1]) # Render function already has header
             tab_prediction.render(df, stats_analyzer, game_type)
         elif selected_tab == TAB_NAMES[2]:
             tab_desdobramento.render(game_type)

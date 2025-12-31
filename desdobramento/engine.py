@@ -9,7 +9,7 @@ class Unfolder:
         }
         self.config = self.game_type_config.get(game_type, self.game_type_config['lotofacil'])
 
-    def unfold(self, selected_numbers, fixed_numbers=None, limit=None):
+    def unfold(self, selected_numbers, fixed_numbers=None, limit=None, override_draw_size=None):
         """
         Generates full games from the selected numbers.
         
@@ -17,8 +17,9 @@ class Unfolder:
             selected_numbers (list): The pool of numbers to generate games from.
             fixed_numbers (list): Numbers that must appear in every game.
             limit (int): Max number of games to generate.
+            override_draw_size (int): Optional size to override standard game size.
         """
-        draw_size = self.config['draw_size']
+        draw_size = override_draw_size if override_draw_size else self.config['draw_size']
         fixed = set(fixed_numbers) if fixed_numbers else set()
         variable = [n for n in selected_numbers if n not in fixed]
         
