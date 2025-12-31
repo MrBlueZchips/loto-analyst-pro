@@ -39,7 +39,7 @@ def main():
     """, unsafe_allow_html=True)
 
     st.title("🎱 Agente Loto Analyst")
-    st.markdown("**Sistema Avançado de Análise de Loterias** | Desenvolvido com Streamlit & Python")
+    st.markdown("**Sistema Avançado de Análise de Loterias** | Desenvolvido com Streamlit & Python | **por Robson Pimentel**")
 
     # Global Manual
     with st.expander("📘 Manual Completo e Treinamento"):
