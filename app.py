@@ -126,20 +126,21 @@ def main():
         # Initialize state if not present
         if "active_tab" not in st.session_state:
             st.session_state["active_tab"] = TAB_NAMES[0]
-
-        # Use Sidebar for Navigation (Mobile Friendly standard)
-        st.sidebar.divider()
-        st.sidebar.header("Navegação")
-        
-        selected_tab = st.sidebar.radio(
-            "Ir para:", 
+            
+        # Navigation back to Main Page (Horizontal)
+        selected_tab = st.radio(
+            "Navegação", 
             TAB_NAMES, 
             index=TAB_NAMES.index(st.session_state["active_tab"]),
+            horizontal=True,
+            label_visibility="collapsed",
             key="nav_radio"
         )
         
         # Sync simple variable with state for logic ensuring
         st.session_state["active_tab"] = selected_tab
+        
+        st.divider()
         
         # Render the selected content logic remains the same...
         if selected_tab == TAB_NAMES[0]:
